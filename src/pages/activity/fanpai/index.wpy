@@ -1,0 +1,273 @@
+<template>
+  <view class="page">
+    <view class="card-module">
+      <repeat for="{{ cardData }}" key="index" index="index" item="cardItem">
+        <view  animation="{{cardItem.animationData}}" class="card card-center" wx:if="{{index === 4}}" @tap="starGame">
+        <view class="front card-item">{{cardItem.front}}</view>
+        <view class="back card-item">{{cardItem.back}}</view>
+      </view>
+      <view wx:else animation="{{cardItem.animationData}}" class="card {{showClass ? 'change' : ''}} {{curOpen === index ? 'getprize' : ''}}" @tap="itemChage({{cardItem}}, {{index}})">
+        <view class="front card-item">{{cardItem.front}}</view>
+        <view class="back card-item">{{cardItem.back}}</view>
+      </view>
+      </repeat>
+    </view>
+    <button @tap="resetData">重置数据</button>
+    <!-- <button >开始游戏</button> -->
+    <button @tap="allChange">全部翻转</button>
+    <button @tap="allMove">全部移动</button>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.page {
+    config = {
+      navigationBarTitleText: '翻牌活动'
+    };
+    computed = {
+    }
+    components = {
+    };
+    data = {
+      animationData: {},
+      cardData: [
+        {
+          animationData: {},
+          front: '正面1',
+          back: '反面1'
+        },
+        {
+          animationData: {},
+          front: '正面2',
+          back: '反面2'
+        },
+        {
+          animationData: {},
+          front: '正面3',
+          back: '反面3'
+        },
+        {
+          animationData: {},
+          front: '正面4',
+          back: '反面4'
+        },
+        // {
+        //   animationData: {},
+        //   front: '正面5',
+        //   back: '反面5'
+        // },
+        {
+          animationData: {},
+          front: '正面6',
+          back: '反面6'
+        },
+        {
+          animationData: {},
+          front: '正面7',
+          back: '反面7'
+        },
+        {
+          animationData: {},
+          front: '正面8',
+          back: '反面8'
+        },
+        {
+          animationData: {},
+          front: '正面9',
+          back: '反面9'
+        }
+      ],
+      showClass: false,
+      curOpen: -1
+    };
+    methods = {
+      resetData () {
+        const total = 9 // 总数
+        const lineTotal = 3 // 单行数
+        let curCardData = this.cardData
+        curCardData.splice((total - 1) / 2, 0, {
+          animationData: {},
+          front: '开始游戏',
+          back: '反面5'
+        })
+        curCardData.map((item, index) => {
+          let x = index % lineTotal
+          let y = parseInt(index / lineTotal)
+          item.twoArry = {x, y}
+        })
+        console.log(curCardData)
+        this.cardData = curCardData
+        // this.cardData.push({
+
+        // })
+      },
+      // 开始游戏
+      starGame () {
+        let timer = null
+        this.showClass = !this.showClass
+        timer = setTimeout(() => {
+          console.log('123')
+          clearTimeout(timer)
+          this.methods.shuffle.call(this, 110)
+          timer = setTimeout(() => {
+            clearTimeout(timer)
+            this.methods.shuffle.call(this, 0)
+          }, 1000)
+        }, 1000)
+      },
+      allChange () {
+        this.showClass = !this.showClass
+      },
+      allMove () {
+        this.methods.shuffle.call(this, 110)
+        let timer = setTimeout(() => {
+          clearTimeout(timer)
+          this.methods.shuffle.call(this, 0)
+          this.$apply()
+        }, 1000)
+      },
+      // 洗牌
+      shuffle (translateUnit) {
+        let curCardData = this.cardData
+        curCardData.map((item, index) => {
+          let animation = wepy.createAnimation({
+            duration: 500,
+            timingFunction: 'ease'
+          })
+          animation.export()
+          const translateUnitX = translateUnit * (1 - item.twoArry.x)
+          const translateUnitY = translateUnit * (1 - item.twoArry.y)
+          animation.translate(translateUnitX, translateUnitY).step()
+          // switch (index) {
+          //   case 0:
+          //     animation.translate(translateUnit, translateUnit).step()
+          //     break
+          //   case 1:
+          //     animation.translate(0, translateUnit).step()
+          //     break
+          //   case 2:
+          //     animation.translate(-translateUnit, translateUnit).step()
+          //     break
+          //   case 3:
+          //     animation.translate(translateUnit, 0).step()
+          //     break
+          //   case 4:
+          //     animation.translate(0, 0).step()
+          //     break
+          //   case 5:
+          //     animation.translate(-translateUnit, 0).step()
+          //     break
+          //   case 6:
+          //     animation.translate(translateUnit, -translateUnit).step()
+          //     break
+          //   case 7:
+          //     animation.translate(0, -translateUnit).step()
+          //     break
+          //   case 8:
+          //     animation.translate(-translateUnit, -translateUnit).step()
+          //     break
+          // }
+          item.animationData = animation.export()
+        })
+        this.cardData = curCardData
+        this.$apply()
+      },
+      // 抽奖
+      itemChage (item, curIndex) {
+        this.cardData[curIndex].front = 'iphone x'
+        console.log(item, curIndex)
+        this.curOpen = curIndex
+      }
+    }
+    onLoad (options) {
+
+    }
+  }
+</script>
+<style lang="less" scoped>
+.card-module{
+  padding: 45rpx;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  transform:translate3d(0,0,0);
+  .card{
+    width: 200rpx;
+    height: 200rpx;
+    line-height: 200rpx;
+    text-align: center;
+    color: #fff;
+    margin: 10rpx;
+    position:relative;
+    overflow:hidden;
+    .card-item{
+      position:absolute;
+      left:0;
+      top:0;
+      width:100%;
+      height:100%;
+      transition:all .5s ease-in-out;
+      transform-style:preserve-3d;
+      backface-visibility:hidden;
+      // border:1px solid #ddd;
+      box-sizing:border-box;
+    }
+    .front{
+      background-color: red;
+      transform: rotateY(0deg);
+      z-index:2;
+    }
+    .back{
+      background-color: #009fff;
+      // display: none;
+      transform: rotateY(180deg);
+      z-index:1;
+    }
+  }
+  .card.change{
+    .front{
+      z-index:1;
+      transform: rotateY(180deg);
+    }
+    .back{
+      z-index:2;
+	    transform: rotateY(0deg);
+    }
+  }
+  .card.getprize{
+    .front{
+      z-index:2;
+      transform: rotateY(0deg);
+    }
+    .back{
+      z-index:1;
+	    transform: rotateY(180deg);
+    }
+  }
+  .card.card-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index:5;
+    .front{
+      left: auto;
+      top: auto;
+      width: 180rpx;
+      height: 180rpx;
+      animation: scale infinite 1s linear;
+    }
+  }
+}
+@keyframes scale {
+    0%{
+        transform: scale(1,1)
+    }
+    50%{
+        transform: scale(1.2, 1.2)
+    }
+    100%{
+        transform: scale(1, 1)
+    }
+}
+</style>
