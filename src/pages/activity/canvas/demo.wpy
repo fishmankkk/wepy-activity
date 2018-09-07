@@ -1,0 +1,157 @@
+<template>
+  <view class="page">
+    <view class="six-bg">
+      <view class="box1"></view>
+      <view class="box2"></view>
+      <view class="box3"></view>
+    </view>
+    <view class="canvas-module" animation="{{animationData}}">
+      <canvas canvas-id="myCanvas" class="canvas-class"/>
+    </view>
+    <button @tap="goStart">开始canvas</button>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class extends wepy.page {
+    config = {
+      navigationBarTitleText: 'CANVAS'
+    };
+    computed = {
+    }
+    components = {
+    };
+    data = {
+      animationData: {},
+      sixData: {
+        one: 10,
+        two: 7,
+        three: 1,
+        four: 6,
+        five: 2,
+        six: 8
+      }
+    };
+    events = {
+    };
+    methods = {
+      goStart () {
+        var animation = wepy.createAnimation({
+          duration: 1000,
+          timingFunction: 'ease'
+        })
+        animation.scale(1, 1).step()
+        this.animationData = animation.export()
+      }
+    }
+    drawCanvas () {
+      const unit = 24  // 单位
+      const centerDotX = 375  // 中心点
+      const centerDotY = 407  // 中心点
+      // 第一个点 位置
+      let dotOne = {
+        x: centerDotX,
+        y: centerDotY - this.sixData.one * unit
+      }
+      // 第二个点 位置
+      const lineLongTwo = unit * this.sixData.two
+      let dotTwo = {
+        x: centerDotX + lineLongTwo * Math.cos((30 * Math.PI) / 180),
+        y: centerDotY - lineLongTwo * Math.sin((30 * Math.PI) / 180)
+      }
+      console.log(dotTwo)
+      // 第三个点 位置
+      const lineLongThree = unit * this.sixData.three
+      let dotThree = {
+        x: centerDotX + lineLongThree * Math.cos((30 * Math.PI) / 180),
+        y: centerDotY + lineLongThree * Math.sin((30 * Math.PI) / 180)
+      }
+      // 第四个点 位置
+      let dotFour = {
+        x: centerDotX,
+        y: centerDotY + this.sixData.four * unit
+      }
+      console.log(dotFour, '第五个点')
+      // 第五个点 位置
+      const lineLongFive = unit * this.sixData.five
+      let dotFive = {
+        x: centerDotX - lineLongFive * Math.cos((30 * Math.PI) / 180),
+        y: centerDotY + lineLongFive * Math.sin((30 * Math.PI) / 180)
+      }
+       // 第六个点 位置
+      const lineLongSix = unit * this.sixData.six
+      let dotSix = {
+        x: centerDotX - lineLongSix * Math.cos((30 * Math.PI) / 180),
+        y: centerDotY - lineLongSix * Math.sin((30 * Math.PI) / 180)
+      }
+      const ctx = wepy.createCanvasContext('myCanvas')
+      ctx.beginPath()
+      ctx.moveTo(dotOne.x / 2, dotOne.y / 2)
+      ctx.lineTo(dotTwo.x / 2, dotTwo.y / 2)
+      ctx.lineTo(dotThree.x / 2, dotThree.y / 2)
+      ctx.lineTo(dotFour.x / 2, dotFour.y / 2)
+      ctx.lineTo(dotFive.x / 2, dotFive.y / 2)
+      ctx.lineTo(dotSix.x / 2, dotSix.y / 2)
+      ctx.lineTo(dotOne.x / 2, dotOne.y / 2)
+      ctx.setStrokeStyle('yellow')
+      ctx.setLineWidth(2)
+      ctx.stroke()
+      // 渐变色
+      const grd = ctx.createLinearGradient(0, 0, 200, 0)
+      grd.addColorStop(0, 'red')
+      grd.addColorStop(1, 'white')
+      ctx.setFillStyle(grd)
+      // 透明度
+      ctx.setGlobalAlpha(0.7)
+      // 填充
+      ctx.fill()
+      ctx.draw()
+    }
+    onLoad (options) {
+      this.drawCanvas()
+    }
+  }
+</script>
+<style lang="less" scoped>
+@sixWidthRPX: 208rpx;
+@sixHeightRPX: 120rpx;
+@sixWidthBigRPX: 416rpx;
+@sixHeightBigRPX: 240rpx;
+.page{
+  .six-bg{
+    padding: 167rpx;
+    .box1{
+      width:0;
+      border-left: @sixWidthRPX solid transparent;
+      border-right: @sixWidthRPX solid transparent;
+      border-bottom: @sixHeightRPX solid #6c6;
+    }
+    .box2{
+      width: @sixWidthBigRPX;
+      height: @sixHeightBigRPX;
+      background-color: #6c6;
+    }
+    .box3{
+      width:0;
+      border-top: @sixHeightRPX solid #6c6;
+      border-left: @sixWidthRPX solid transparent;
+      border-right: @sixWidthRPX solid transparent;
+    }
+  }
+  .canvas-module{
+    position: absolute;
+    width: 750rpx;
+    height: 750rpx;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    transform: scale(0);
+    .canvas-class{
+      width: 750rpx;
+      height: 750rpx;
+    }
+  }
+
+}
+</style>
